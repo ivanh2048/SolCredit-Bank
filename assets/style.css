@@ -1,0 +1,137 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Легкий блакитний градієнт */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+
+.logo-bubble {
+    position: absolute;
+    bottom: -150px;
+    width: 100px;
+    height: 100px;
+    background: url('/image/solcredit.webp') no-repeat center center;
+    background-size: contain;
+    opacity: 0.2;
+    animation: float 10s ease-in infinite;
+}
+
+.logo-bubble:nth-child(1) {
+    left: 10%;
+    width: 80px;
+    height: 80px;
+    animation-duration: 12s;
+}
+
+.logo-bubble:nth-child(2) {
+    left: 30%;
+    width: 100px;
+    height: 100px;
+    animation-duration: 10s;
+}
+
+.logo-bubble:nth-child(3) {
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    animation-duration: 14s;
+}
+
+.logo-bubble:nth-child(4) {
+    left: 70%;
+    width: 90px;
+    height: 90px;
+    animation-duration: 11s;
+}
+
+.logo-bubble:nth-child(5) {
+    left: 90%;
+    width: 60px;
+    height: 60px;
+    animation-duration: 9s;
+}
+
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 3rem;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+p {
+    font-size: 1.3em;
+    margin-bottom: 30px;
+    color: #ffffff;
+    font-weight: 300;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+.button {
+    background: linear-gradient(45deg, #67b26f, #4ca2cd);
+    border: none;
+    color: #ffffff;
+    font-size: 1.2em;
+    padding: 15px 30px;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 50px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+    background: linear-gradient(45deg, #4ca2cd, #67b26f);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+
+.logo {
+    margin-bottom: 20px;
+    width: 150px;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: rotate(5deg) scale(1.05);
+}

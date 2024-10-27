@@ -1,0 +1,110 @@
+body.dark-theme {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.container.dark-theme {
+    background: rgba(33, 45, 72, 0.8);
+    border-radius: 15px;
+    padding: 2rem;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h1.dark-theme, label.dark-theme, a.dark-theme, .message.dark-theme {
+    color: #ccd1e4;
+}
+
+input.dark-theme {
+    background: rgba(43, 51, 74, 0.7);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+button.dark-theme {
+    padding: 0.5rem 2rem;
+    background: linear-gradient(45deg, #2a5298, #1e3c72);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.5s ease, transform 0.2s;
+}
+
+
+body.light-theme {
+    background: linear-gradient(135deg, #dce3e8, #c2c9d1);
+    color: #2e2e2e; 
+}
+
+.container.light-theme {
+    background-color: rgba(255, 255, 255, 0.85); 
+    color: #2e2e2e; 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
+}
+
+.button.light-theme {
+    background-color: #4ca2cd;
+    border: 2px solid #4ca2cd;
+    color: #ffffff;
+}
+
+.button.light-theme:hover {
+    background-color: #3a8bb7; 
+}
+
+h1.light-theme {
+    color: #2e2e2e; 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); 
+}
+
+p.light-theme {
+    color: #4a4a4a; 
+}
+
+.logo.light-theme {
+    filter: brightness(0.85); 
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    p {
+        font-size: 1.2em;
+    }
+    .button {
+        font-size: 1em;
+        padding: 8px 15px;
+    }
+}
+
+
+#theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+#theme-icon {
+    width: 40px;
+    height: 40px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+#theme-toggle:hover #theme-icon {
+    filter: brightness(1.5);
+}
+
