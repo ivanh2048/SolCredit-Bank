@@ -1,4 +1,4 @@
-Bank Project
+# Bank Project
 This project is a banking simulation designed for educational purposes. The main goal is to create a web application to manage banking functions such as account registration, authorization, transaction management, PIN verification and card blocking.
 
 Technologies
