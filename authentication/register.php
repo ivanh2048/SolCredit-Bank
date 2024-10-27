@@ -1,11 +1,11 @@
 <?php
 session_start();
-include 'config.php';
+include '../bank-app/config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/../phpmailer/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
