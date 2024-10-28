@@ -7,15 +7,12 @@ if (!isset($_SESSION['username'])) {
 
 include 'config.php';
 
-// Ініціалізація змінних з безпечними значеннями за замовчуванням
 $username = $_SESSION['username'] ?? null;
 $card_number = 'N/A';
 $balance = '100.00';
 $expiry_date = '12/25';
 
-// Перевіряємо, чи є в сесії ім'я користувача
 if ($username) {
-    // Запит до бази даних для отримання інформації про користувача
     $sql = "SELECT * FROM bank.users WHERE username=:username";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':username', $username);
@@ -23,7 +20,6 @@ if ($username) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // Якщо користувач знайдений, присвоюємо значення
         $card_number = $user['card_number'] ?? 'N/A';
         $balance = $user['balance'] ?? '100.00';
         $expiry_date = $user['expiry_date'] ?? '12/25';
@@ -53,7 +49,7 @@ $conn = null;
         }
 
         .dashboard-container {
-            background-color: #ffffff; /* Встановлюємо білий непрозорий фон */
+            background-color: #ffffff;
             width: 100%;
             max-width: 900px;
             display: flex;
@@ -61,13 +57,13 @@ $conn = null;
             align-items: center;
             text-align: center;
             padding: 30px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Тінь для глибини */
-            border-radius: 20px; /* Трохи заокруглюємо кути для більш плавного вигляду */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); 
+            border-radius: 20px; 
         }
 
         .balance-section {
             text-align: left;
-            flex: 0.5; /* Зменшуємо flex для правильного центрування */
+            flex: 0.5; 
         }
 
         .balance-section h1 {
@@ -99,11 +95,11 @@ $conn = null;
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.4s ease-in-out, box-shadow 0.3s ease-in-out;
-            background: linear-gradient(135deg, #3b5998, #8b9dc3); /* Привабливий градієнт для картки */
+            background: linear-gradient(135deg, #3b5998, #8b9dc3); 
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            justify-content: center; /* Вирівнюємо елементи всередині картки */
-            align-items: center; /* Вирівнюємо елементи по вертикалі */
+            justify-content: center; 
+            align-items: center; 
         }
 
         .flipped {
@@ -163,9 +159,9 @@ $conn = null;
 
         .buttons-container {
             display: flex;
-            flex-direction: column; /* Кнопки розташовані вертикально */
+            flex-direction: column; 
             justify-content: center;
-            gap: 10px; /* Проміжок між кнопками */
+            gap: 10px; 
         }
 
         .buttons-section {
@@ -181,8 +177,8 @@ $conn = null;
         }
 
             .buttons-section .button:hover {
-                transform: scale(1.1); /* Легке збільшення при наведенні */
-                background-color: #f0f0f0; /* Зміна фону кнопки */
+                transform: scale(1.1); 
+                background-color: #f0f0f0; 
             }
 
         .button {
@@ -228,8 +224,7 @@ $conn = null;
         }
 
         .logout-button {
-            background-color: #e74c3c; /* Червоний фон для кнопки виходу */
-            color: #fff;
+            background-color: #e74c3c; 
             border: none;
             font-size: 1rem;
             padding: 0.7rem 1.5rem;
@@ -243,14 +238,14 @@ $conn = null;
         }
 
         .modal {
-            display: none; /* Сховане за замовчуванням */
+            display: none; 
             position: fixed;
             z-index: 1;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Фон модального вікна */
+            background-color: rgba(0, 0, 0, 0.5); 
         }
 
         .modal-content {
@@ -322,24 +317,20 @@ $conn = null;
 <body>
 
 <div class="dashboard-container">
-    <!-- Секція з балансом -->
     <div class="balance-section">
         <h1><?php echo htmlspecialchars($balance); ?> PLN</h1>
         <p>Własne środki: <?php echo htmlspecialchars($balance); ?> PLN</p>
         <p>Kredytowy limit: 20 000 PLN</p>
     </div>
 
-    <!-- Контейнер для картки з анімацією перевертання -->
     <div class="card-container">
         <div class="bank-card" id="bank-card">
-            <!-- Передня частина -->
             <div class="card-front">
                 <div class="card-number">**** **** **** <?php echo substr($card_number, -4); ?></div>
                 <div class="card-expiry"><?php echo htmlspecialchars($expiry_date); ?></div>
                 <div class="card-holder"><?php echo htmlspecialchars($username ?? 'N/A'); ?></div>
             </div>
 
-            <!-- Задня частина -->
             <div class="card-back">
                 <div class="magnetic-strip"></div>
                 <div class="card-cvv">CVV: <span class="mask-cvv">***</span></div>
@@ -347,7 +338,6 @@ $conn = null;
         </div>
     </div>
 
-    <!-- Секція з кнопками -->
     <div class="buttons-section">
         <a href="transfer.php" class="button">
             <img src="/image/money.png" class="icon" alt="Transfer Icon">
@@ -368,7 +358,6 @@ $conn = null;
     <div class="modal-content">
         <span class="modal-close" id="closeModal">&times;</span>
         <div class="modal-header">Nastawienia karty</div>
-        <!-- Налаштування -->
         <div class="settings-item">
             <span>Zmień PIN</span>
             <button id="changePinButton" type="button">Zmień</button>
@@ -389,24 +378,20 @@ $conn = null;
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Показати модальне вікно при натисканні на кнопку "Nastawienia"
         $("#settingsButton").click(function() {
             $("#settingsModal").css("display", "block");
         });
 
-        // Закрити модальне вікно при натисканні на хрестик
         $("#closeModal").click(function() {
             $("#settingsModal").css("display", "none");
         });
 
-        // Закрити модальне вікно, якщо натиснути за межами вікна
         $(window).click(function(event) {
             if ($(event.target).is("#settingsModal")) {
                 $("#settingsModal").css("display", "none");
             }
         });
 
-        // Змінити PIN
         $("#changePinButton").click(function() {
             var newPin = prompt("Wprowadź nowy PIN (4 cyfry):");
             if (newPin && newPin.length === 4 && !isNaN(newPin)) {
@@ -427,11 +412,10 @@ $conn = null;
             }
         });
 
-        // Заблокувати або розблокувати картку
         $("#toggleCardLockButton").click(function() {
             var currentText = $(this).text();
             var lockStatus = (currentText === "Zablokuj") ? "lock" : "unlock";
-            var button = $(this); // Зберігаємо посилання на кнопку, щоб потім змінити текст
+            var button = $(this); 
 
             $.ajax({
                 url: 'toggle_card_lock.php',
@@ -448,7 +432,6 @@ $conn = null;
             });
         });
 
-        // Встановити ліміт транзакцій
         $("#setTransactionLimitsButton").click(function() {
             var newLimit = prompt("Wprowadź nowy limit transakcji (PLN):");
             if (newLimit && !isNaN(newLimit)) {

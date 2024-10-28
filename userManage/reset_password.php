@@ -8,13 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = htmlspecialchars($_POST['username']);
     $new_password = $_POST['new_password'];
 
-    // Перевірка надійності пароля
     if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $new_password)) {
         $message = "<p class='error-message'>Hasło musi zawierać co najmniej 8 znaków, w tym jedną dużą literę, jedną cyfrę i jeden znak specjalny.</p>";
     } else {
         $new_password_hashed = password_hash($new_password, PASSWORD_DEFAULT);
-
-        // Перевірка, чи існує користувач
         $sql = "SELECT * FROM bank.users WHERE username = :username";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $username);
@@ -22,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            // Оновлення пароля користувача
             $sql_update = "UPDATE bank.users SET password = :new_password WHERE id = :user_id";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bindParam(':new_password', $new_password_hashed);
@@ -30,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($stmt_update->execute()) {
                 $message = "<p class='success-message'>Hasło zostało zaktualizowane. Przekierowanie na stronę logowania...</p>";
-                // Перенаправлення на сторінку входу через 3 секунди
                 header("refresh:3;url=login.php");
             } else {
                 $message = "<p class='error-message'>Nie udało się zaktualizować hasła.</p>";

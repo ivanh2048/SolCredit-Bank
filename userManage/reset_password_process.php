@@ -6,11 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username_or_email = htmlspecialchars($_POST['username_or_email']);
     $new_password = $_POST['new_password'];
 
-    // Валідація нового пароля
     if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $new_password)) {
         echo '<span class="error-message">Hasło musi zawierać co najmniej 8 znaków, w tym jedną dużą literę, jedną cyfrę i jeden znak specjalny.</span>';
     } else {
-        // Перевірка, чи існує користувач з вказаним іменем користувача або email
         $sql = "SELECT * FROM bank.users WHERE username=? OR email=?";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(1, $username_or_email);
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            // Оновлення пароля користувача
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
             $sql_update = "UPDATE bank.users SET password=? WHERE id=?";
             $stmt_update = $conn->prepare($sql_update);
@@ -28,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($stmt_update->execute()) {
                 echo '<span class="success-message">Hasło zostało zresetowane pomyślnie.</span>';
-                // Повернення на сторінку входу через 3 секунди
                 header('Refresh: 3; URL=login.php');
                 exit();
             } else {

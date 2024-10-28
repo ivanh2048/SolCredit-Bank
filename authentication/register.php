@@ -11,7 +11,6 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Функція для генерації випадкового номеру картки
 function generateCardNumber($conn) {
     do {
         $randomDigits = mt_rand(1000000000000000, 9999999999999999);
@@ -24,7 +23,6 @@ function generateCardNumber($conn) {
     return $randomDigits;
 }
 
-// Функція для генерації дати дії картки (3–5 років вперед)
 function generateExpiryDate() {
     $currentYear = date('Y');
     $currentMonth = date('m');
@@ -48,19 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = isset($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
     $confirm_password = $_POST['confirm_password'];
     $role = 'user';
-    $activated = 1; // Установлюємо як активного користувача
+    $activated = 1; 
     $card_number = generateCardNumber($conn);
-    $expiry_date = generateExpiryDate(); // Генерація дати дії картки
-    $initial_balance = 100.00; // Початковий баланс у 100 злотих
-    $verification_code = rand(100000, 999999); // Генеруємо 6-значний код підтвердження
+    $expiry_date = generateExpiryDate(); 
+    $initial_balance = 100.00; 
+    $verification_code = rand(100000, 999999); 
 
-    // Перевірка чи паролі збігаються
+   
     if (!password_verify($confirm_password, $password)) {
         $message = '<span class="error-message">Hasła nie pasują do siebie.</span>';
     } elseif (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/\d/', $password) || !preg_match('/[@$!%*?&]/', $password)) {
         $message = '<span class="error-message">Hasło nie spełnia wymagań bezpieczeństwa.</span>';
     } else {
-        // Перевірка наявності користувача
         $stmt = $conn->prepare("SELECT * FROM bank.users WHERE username = ? OR email = ?");
         $stmt->bindParam(1, $username);
         $stmt->bindParam(2, $email);
@@ -70,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($existingUser) {
             $message = '<span class="error-message">Nazwa użytkownika lub email już istnieje.</span>';
         } else {
-            // Додавання нового користувача
             $stmt = $conn->prepare("INSERT INTO bank.users (username, email, password, role, activated, card_number, expiry_date, balance, verification_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bindParam(1, $username);
             $stmt->bindParam(2, $email);
@@ -83,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindParam(9, $verification_code);
 
             if ($stmt->execute()) {
-                // Надсилання листа з кодом підтвердження
                 sendVerificationEmail($email, $verification_code);
                 $_SESSION['success_message'] = 'Rejestracja udana. Sprawdź swoją skrzynkę mailową, aby otrzymać kod potwierdzenia.';
                 header('Location: login.php');
@@ -98,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 function sendVerificationEmail($email, $code) {
     $mail = new PHPMailer(true);
     try {
-        // Налаштування сервера
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
@@ -107,11 +101,9 @@ function sendVerificationEmail($email, $code) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // Одержувачі
         $mail->setFrom('grabovskyivan78@gmail.com', 'SolCredit');
         $mail->addAddress($email);
 
-        // Зміст листа
         $mail->isHTML(true);
         $mail->Subject = 'Kod potwierdzenia rejestracji - SolCredit';
         $mail->Body    = 'Twój kod potwierdzenia to: ' . $code;

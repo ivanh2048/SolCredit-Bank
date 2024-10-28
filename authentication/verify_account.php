@@ -10,7 +10,6 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['resend'])) {
-        // Повторна відправка коду
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
 
         if ($username) {
@@ -27,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bindParam(':username', $username);
                     $stmt->execute();
 
-                    // Використання PHPMailer для надсилання нового коду
+                    
                     $mail = new PHPMailer(true);
                     try {
-                        // Налаштування сервера
+                        
                         $mail->isSMTP();
                         $mail->Host       = 'smtp.gmail.com';
                         $mail->SMTPAuth   = true;
@@ -39,11 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port       = 587;
 
-                        // Одержувачі
                         $mail->setFrom('grabovskyivan78@gmail.com', 'SolCredit');
                         $mail->addAddress($user['email']);
 
-                        // Зміст листа
                         $mail->isHTML(true);
                         $mail->Subject = 'Twój kod weryfikacyjny - SolCredit';
                         $mail->Body    = 'Twój nowy kod weryfikacyjny to: ' . $verification_code;
@@ -63,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = '<span class="error-message">Proszę podać nazwę użytkownika.</span>';
         }
     } else {
-        // Підтвердження аккаунта
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
         $verification_code = filter_input(INPUT_POST, 'verification_code', FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -79,8 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindParam(':username', $username);
                 $stmt->execute();
                 $message = '<span class="success-message">Konto zostało pomyślnie potwierdzone.</span>';
-                
-                // Перенаправлення на сторінку логування без коду підтвердження
                 header('Location: login_after_verification.php');
                 exit();
             }
