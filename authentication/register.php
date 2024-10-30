@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = htmlspecialchars($_POST['email']);
     $password = isset($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
     $confirm_password = $_POST['confirm_password'];
-    $role = 'user';
+    $role = htmlspecialchars($_POST['role']);
     $activated = 1; 
     $card_number = generateCardNumber($conn);
     $expiry_date = generateExpiryDate(); 

@@ -27,6 +27,8 @@ if ($username) {
 }
 
 $conn = null;
+
+$isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
 ?>
 
 <!DOCTYPE html>
@@ -312,6 +314,27 @@ $conn = null;
         .settings-item button:active {
             transform: scale(0.98);
         }
+
+        .admin-actions button {
+        padding: 0.5rem 1.5rem; /* Wewnętrzne odstępy */
+        background: linear-gradient(45deg, #4CAF50, #2E7D32); /* Kolor tła */
+        color: white; /* Kolor tekstu */
+        border: none; /* Bez obramowania */
+        border-radius: 5px; /* Zaokrąglenie rogów */
+        font-size: 1rem; /* Rozmiar czcionki */
+        cursor: pointer; /* Kursor zmienia się na wskaźnik */
+        transition: background 0.3s, transform 0.2s; /* Przejrzystość i transformacja */
+        }
+
+        .admin-actions button:hover {
+            background: linear-gradient(45deg, #388E3C, #4CAF50); /* Zmiana koloru tła na hover */
+            transform: scale(1.05); /* Lekki efekt powiększenia */
+        }
+
+        .admin-actions button:active {
+            transform: scale(0.95); /* Efekt przycisku podczas kliknięcia */
+        }
+
     </style>
 </head>
 <body>
@@ -321,7 +344,15 @@ $conn = null;
         <h1><?php echo htmlspecialchars($balance); ?> PLN</h1>
         <p>Własne środki: <?php echo htmlspecialchars($balance); ?> PLN</p>
         <p>Kredytowy limit: 20 000 PLN</p>
+
+        <?php if ($isAdmin): ?>
+        <div class="admin-actions">
+            <button onclick="window.location.href='/transactions/create_admin.php';">Dodaj nowego administratora</button>
+        </div>
+        <?php endif; ?>
     </div>
+
+    
 
     <div class="card-container">
         <div class="bank-card" id="bank-card">

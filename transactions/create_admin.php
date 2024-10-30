@@ -1,7 +1,40 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
+include '../bank-app/config.php';
+
+// Sprawdzenie, czy użytkownik jest zalogowany jako admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: /authentication/login.php');
+    exit();
+}
+
+// Sprawdzenie, czy formularz został wysłany
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = htmlspecialchars($_POST['username']);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = 'admin'; // Ustalamy rolę na admin
+
+    // Sprawdzenie, czy nazwa użytkownika już istnieje
+    $stmt = $conn->prepare("SELECT * FROM bank.users WHERE username = ?");
+    $stmt->bindParam(1, $username);
+    $stmt->execute();
+    $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existingUser) {
+        echo json_encode(['status' => 'error', 'message' => 'Nazwa użytkownika już istnieje.']);
+    } else {
+        // Tworzenie nowego konta administratora
+        $stmt = $conn->prepare("INSERT INTO bank.users (username, password, role) VALUES (?, ?, ?)");
+        $stmt->bindParam(1, $username);
+        $stmt->bindParam(2, $password);
+        $stmt->bindParam(3, $role);
+
+        if ($stmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Konto administratora zostało utworzone.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Błąd podczas tworzenia konta.']);
+        }
+    }
     exit();
 }
 ?>
@@ -12,7 +45,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     <meta charset="UTF-8">
     <title>Utwórz konto administratora</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Dodaj jQuery -->
     <style>
         body {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -87,19 +120,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             transform: scale(1.05);
         }
 
-        a {
-            display: block;
-            margin-top: 1rem;
-            color: #ccd1e4;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.3s;
-        }
-
-        a:hover {
-            color: #a4b0d1;
-        }
-
         .message {
             margin-top: 1rem;
             padding: 0.5rem;
@@ -146,20 +166,20 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     </style>
 </head>
 <body>
-    <div>
-        <h2>Utwórz konto administratora</h2>
+    <div class="container">
+        <h1>Utwórz konto administratora</h1>
         <form id="createAdminForm">
             <input type="text" id="adminUsername" placeholder="Nazwa użytkownika" required>
             <input type="password" id="adminPassword" placeholder="Hasło" required>
             <button type="submit">Utwórz konto</button>
         </form>
-        <div id="adminMessage"></div>
+        <div id="adminMessage" class="message"></div>
     </div>
 
     <script>
         $(document).ready(function() {
             $("#createAdminForm").submit(function(event) {
-                event.preventDefault(); 
+                event.preventDefault(); // Zapobiega przeładowaniu strony
 
                 var username = $("#adminUsername").val();
                 var password = $("#adminPassword").val();
@@ -169,6 +189,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                     type: 'POST',
                     data: { action: 'create_admin', username: username, password: password },
                     success: function(response) {
+                        console.log(response);
                         var result = JSON.parse(response);
                         $("#adminMessage").text(result.message);
                     },
