@@ -1,10 +1,9 @@
 <?php
 session_start();
-include 'config.php';
+include '../bank-app/config.php';
 
 $message = "";
 
-// Генерація CSRF токена
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -17,11 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $receiver_card_number = htmlspecialchars($_POST['receiver_card_number']);
         $amount = htmlspecialchars($_POST['amount']);
 
-        // Валідація суми переказу
         if (!is_numeric($amount) || $amount <= 0) {
             $message = "<p style='color: red;'>Błąd: kwota przelewu musi być większa niż zero i poprawnie sformatowana.</p>";
         } else {
-            // Pobieranie danych nadawcy
             $sql_sender = "SELECT id, balance FROM bank.users WHERE username=:username";
             $stmt_sender = $conn->prepare($sql_sender);
             $stmt_sender->bindParam(':username', $sender_username);
@@ -31,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$sender_data) {
                 $message = "<p style='color: red;'>Błąd: nieznany nadawca.</p>";
             } else {
-                // Sprawdzenie czy odbiorca istnieje (po numerze karty)
                 $sql_receiver = "SELECT id, balance FROM bank.users WHERE card_number=:card_number";
                 $stmt_receiver = $conn->prepare($sql_receiver);
                 $stmt_receiver->bindParam(':card_number', $receiver_card_number);
@@ -43,29 +39,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } elseif ($sender_data['balance'] < $amount) {
                     $message = "<p style='color: red;'>Błąd: niewystarczające środki na koncie nadawcy.</p>";
                 } else {
-                    // Obliczenie nowych sald
                     $new_sender_balance = $sender_data['balance'] - $amount;
                     $new_receiver_balance = $receiver_data['balance'] + $amount;
 
-                    // Rozpoczęcie transakcji
                     try {
                         $conn->beginTransaction();
 
-                        // Aktualizacja salda nadawcy
                         $sql_update_sender = "UPDATE bank.users SET balance=:balance WHERE id=:id";
                         $stmt_update_sender = $conn->prepare($sql_update_sender);
                         $stmt_update_sender->bindParam(':balance', $new_sender_balance);
                         $stmt_update_sender->bindParam(':id', $sender_data['id']);
                         $stmt_update_sender->execute();
 
-                        // Aktualizacja salda odbiorcy
                         $sql_update_receiver = "UPDATE bank.users SET balance=:balance WHERE id=:id";
                         $stmt_update_receiver = $conn->prepare($sql_update_receiver);
                         $stmt_update_receiver->bindParam(':balance', $new_receiver_balance);
                         $stmt_update_receiver->bindParam(':id', $receiver_data['id']);
                         $stmt_update_receiver->execute();
 
-                        // Zapisanie przelewu do historii
                         $sql_transfer = "INSERT INTO bank.transfers (sender_id, receiver_id, receiver_card_number, amount, timestamp) VALUES (:sender_id, :receiver_id, :receiver_card_number, :amount, NOW())";
                         $stmt_transfer = $conn->prepare($sql_transfer);
                         $stmt_transfer->bindParam(':sender_id', $sender_data['id']);

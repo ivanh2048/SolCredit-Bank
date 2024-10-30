@@ -1,44 +1,8 @@
 <?php
 session_start();
-include '../bank-app/config.php';
-
-$message = '';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
-
-    if ($username && $password) {
-        try {
-            $sql = "SELECT * FROM bank.users WHERE username = :username";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':username', $username);
-            $stmt->execute();
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $username;
-                $_SESSION['role'] = $user['role'];
-                session_regenerate_id(true);
-                $_SESSION['message'] = 'Logowanie przeszło bez żadnych problemów.';
-                header('Location: /bank-app/dashboard.php');
-                exit();
-            } else {
-                $_SESSION['message'] = 'Nieprawidłowe hasło lub konto.';
-                header('Location: login.php');
-                exit();
-            }
-        } catch (PDOException $e) {
-            $_SESSION['message'] = 'Błąd połączenia z bazą danych: ' . $e->getMessage();
-            header('Location: login.php');
-            exit();
-        }
-    } else {
-        $_SESSION['message'] = 'Proszę wprowadzić nazwę użytkownika i hasło.';
-        header('Location: login.php');
-        exit();
-    }
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: login.php');
+    exit();
 }
 ?>
 
@@ -46,8 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Logowanie</title>
+    <title>Utwórz konto administratora</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -181,27 +146,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Logowanie</h1>
-        <form action="login.php" method="POST">
-        <label for="username"><i class="fa fa-user"></i> Nazwa użytkownika:</label>
-        <input type="text" id="username" name="username" required>
-        <label for="password"><i class="fa fa-lock"></i> Hasło:</label>
-        <input type="password" id="password" name="password" required>
-        <label for="verification_code"><i class="fa fa-key"></i> Kod potwierdzenia:</label>
-        <input type="text" id="verification_code" name="verification_code" required>
-        <button type="submit">Zaloguj się</button>
+    <div>
+        <h2>Utwórz konto administratora</h2>
+        <form id="createAdminForm">
+            <input type="text" id="adminUsername" placeholder="Nazwa użytkownika" required>
+            <input type="password" id="adminPassword" placeholder="Hasło" required>
+            <button type="submit">Utwórz konto</button>
         </form>
-        <a href="/userManage/reset_password.php">Zapomniałem hasła</a>
-        <a href="/bank-app/index.html">Powrót na stronę główną</a>
-        <div class="message">
-            <?php
-            if (isset($_SESSION['message'])) {
-                echo '<span class="error-message">' . $_SESSION['message'] . '</span>';
-                unset($_SESSION['message']);
-            }
-            ?>
-        </div>
+        <div id="adminMessage"></div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#createAdminForm").submit(function(event) {
+                event.preventDefault(); 
+
+                var username = $("#adminUsername").val();
+                var password = $("#adminPassword").val();
+
+                $.ajax({
+                    url: '/transactions/api.php',
+                    type: 'POST',
+                    data: { action: 'create_admin', username: username, password: password },
+                    success: function(response) {
+                        var result = JSON.parse(response);
+                        $("#adminMessage").text(result.message);
+                    },
+                    error: function() {
+                        $("#adminMessage").text('Wystąpił błąd podczas tworzenia konta.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

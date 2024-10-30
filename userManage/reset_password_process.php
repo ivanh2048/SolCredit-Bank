@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'config.php';
+include '../bank-app/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username_or_email = htmlspecialchars($_POST['username_or_email']);

@@ -135,3 +135,23 @@ p {
 .logo:hover {
     transform: rotate(5deg) scale(1.05);
 }
+
+.styled-select {
+    width: 100%; /* Szerokość 100% */
+    padding: 0.6rem; /* Odstępy wewnętrzne */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Obramowanie */
+    border-radius: 8px; /* Zaokrąglenie rogów */
+    background: rgba(43, 51, 74, 0.7); /* Tło */
+    color: #fff; /* Kolor tekstu */
+    font-size: 1rem; /* Rozmiar czcionki */
+    transition: background 0.3s ease; /* Efekt przejścia */
+}
+
+.styled-select:hover {
+    background: rgba(43, 51, 74, 0.9); /* Zmiana tła przy najechaniu */
+}
+
+.styled-select:focus {
+    outline: none; /* Usunięcie konturu */
+    box-shadow: 0 0 10px rgba(100, 150, 255, 0.6); /* Cień przy skupieniu */
+}

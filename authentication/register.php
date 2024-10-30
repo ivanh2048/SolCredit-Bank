@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($existingUser) {
             $message = '<span class="error-message">Nazwa użytkownika lub email już istnieje.</span>';
         } else {
-            $stmt = $conn->prepare("INSERT INTO bank.users (username, email, password, role, activated, card_number, expiry_date, balance, verification_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO bank.users (username, email, password, role, activated, card_number, expiry_date, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bindParam(1, $username);
             $stmt->bindParam(2, $email);
             $stmt->bindParam(3, $password);
@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindParam(6, $card_number);
             $stmt->bindParam(7, $expiry_date);
             $stmt->bindParam(8, $initial_balance);
-            $stmt->bindParam(9, $verification_code);
 
             if ($stmt->execute()) {
                 sendVerificationEmail($email, $verification_code);
@@ -312,7 +311,7 @@ function sendVerificationEmail($email, $code) {
 <body>
     <div class="container">
         <h1>Rejestracja</h1>
-        <form action="/authentication/register.php" method="POST">
+        <form action="register.php" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
             <label for="username"><i class="fa fa-user"></i> Nazwa użytkownika:</label>
             <input type="text" id="username" name="username" required>
@@ -324,8 +323,15 @@ function sendVerificationEmail($email, $code) {
             <label for="confirm_password"><i class="fa fa-lock"></i> Potwierdź hasło:</label>
             <input type="password" id="confirm_password" name="confirm_password" required>
             <div id="password-error" style="color: red;"></div>
-            <button type="submit">Zarejestruj się</button>
+        
+            <select id="role" name="role" class="styled-select">
+                <option value="user">Użytkownik</option>
+                <option value="admin">Administrator</option>
+            </select>
+
+        <button type="submit">Zarejestruj się</button>
         </form>
+
         <a href="/bank-app/index.html">Powrót na stronę główną</a>
         <div class="message">
             <?php echo $message; ?>

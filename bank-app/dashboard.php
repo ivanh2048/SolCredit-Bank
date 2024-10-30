@@ -5,7 +5,7 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-include 'config.php';
+include '../bank-app/config.php';
 
 $username = $_SESSION['username'] ?? null;
 $card_number = 'N/A';
@@ -173,7 +173,7 @@ $conn = null;
         }
 
         .buttons-section .button {
-            transition: transform 0.2s ease-in-out, background-color 0.3s; /* Додаємо анімацію при наведенні */
+            transition: transform 0.2s ease-in-out, background-color 0.3s; 
         }
 
             .buttons-section .button:hover {
@@ -330,7 +330,6 @@ $conn = null;
                 <div class="card-expiry"><?php echo htmlspecialchars($expiry_date); ?></div>
                 <div class="card-holder"><?php echo htmlspecialchars($username ?? 'N/A'); ?></div>
             </div>
-
             <div class="card-back">
                 <div class="magnetic-strip"></div>
                 <div class="card-cvv">CVV: <span class="mask-cvv">***</span></div>
@@ -339,16 +338,16 @@ $conn = null;
     </div>
 
     <div class="buttons-section">
-        <a href="transfer.php" class="button">
+        <a href="/transactions/transfer.php" class="button">
             <img src="/image/money.png" class="icon" alt="Transfer Icon">
         </a>
-        <a href="history.php" class="button">
+        <a href="/transactions/history.php" class="button">
             <img src="/image/history.png" class="icon" alt="History Icon">
         </a>
         <button class="button" id="settingsButton">
             <img src="/image/settings.png" class="icon" alt="Settings Icon"> 
         </button>
-        <a href="logout.php" class="logout-button">
+        <a href="/authentication/logout.php" class="logout-button">
             <img src="/image/logout.png" class="icon" alt="Logout Icon">
         </a>
     </div>
@@ -376,83 +375,7 @@ $conn = null;
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $("#settingsButton").click(function() {
-            $("#settingsModal").css("display", "block");
-        });
-
-        $("#closeModal").click(function() {
-            $("#settingsModal").css("display", "none");
-        });
-
-        $(window).click(function(event) {
-            if ($(event.target).is("#settingsModal")) {
-                $("#settingsModal").css("display", "none");
-            }
-        });
-
-        $("#changePinButton").click(function() {
-            var newPin = prompt("Wprowadź nowy PIN (4 cyfry):");
-            if (newPin && newPin.length === 4 && !isNaN(newPin)) {
-                $.ajax({
-                    url: 'change_pin.php',
-                    type: 'POST',
-                    data: { new_pin: newPin },
-                    success: function(response) {
-                        var result = JSON.parse(response);
-                        alert(result.message);
-                    },
-                    error: function() {
-                        alert('Wystąpił błąd podczas zmiany PIN.');
-                    }
-                });
-            } else {
-                alert("Nieprawidłowy PIN. Spróbuj ponownie.");
-            }
-        });
-
-        $("#toggleCardLockButton").click(function() {
-            var currentText = $(this).text();
-            var lockStatus = (currentText === "Zablokuj") ? "lock" : "unlock";
-            var button = $(this); 
-
-            $.ajax({
-                url: 'toggle_card_lock.php',
-                type: 'POST',
-                data: { lock_status: lockStatus },
-                success: function(response) {
-                    var result = JSON.parse(response);
-                    alert(result.message);
-                    button.text((lockStatus === "lock") ? "Odblokuj" : "Zablokuj");
-                },
-                error: function() {
-                    alert('Wystąpił błąd podczas zmiany statusu karty.');
-                }
-            });
-        });
-
-        $("#setTransactionLimitsButton").click(function() {
-            var newLimit = prompt("Wprowadź nowy limit transakcji (PLN):");
-            if (newLimit && !isNaN(newLimit)) {
-                $.ajax({
-                    url: 'set_transaction_limit.php',
-                    type: 'POST',
-                    data: { new_limit: newLimit },
-                    success: function(response) {
-                        var result = JSON.parse(response);
-                        alert(result.message);
-                    },
-                    error: function() {
-                        alert('Wystąpił błąd podczas ustawiania limitu.');
-                    }
-                });
-            } else {
-                alert("Nieprawidłowy limit. Spróbuj ponownie.");
-            }
-        });
-    });
-</script>
+<script src="/assets/transactions.js"></script>
 
 </body>
 </html>
