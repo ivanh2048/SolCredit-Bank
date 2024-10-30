@@ -170,6 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Utwórz konto administratora</h1>
         <form id="createAdminForm">
             <input type="text" id="adminUsername" placeholder="Nazwa użytkownika" required>
+            <input type="email" id="adminEmail" placeholder="E-mail" required>
             <input type="password" id="adminPassword" placeholder="Hasło" required>
             <button type="submit">Utwórz konto</button>
         </form>
@@ -178,27 +179,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         $(document).ready(function() {
-            $("#createAdminForm").submit(function(event) {
-                event.preventDefault(); // Zapobiega przeładowaniu strony
+        $("#createAdminForm").submit(function(event) {
+        event.preventDefault(); 
 
-                var username = $("#adminUsername").val();
-                var password = $("#adminPassword").val();
+        var username = $("#adminUsername").val();
+        var email = $("#adminEmail").val(); 
+        var password = $("#adminPassword").val();
 
-                $.ajax({
-                    url: '/transactions/api.php',
-                    type: 'POST',
-                    data: { action: 'create_admin', username: username, password: password },
-                    success: function(response) {
-                        console.log(response);
-                        var result = JSON.parse(response);
-                        $("#adminMessage").text(result.message);
-                    },
-                    error: function() {
-                        $("#adminMessage").text('Wystąpił błąd podczas tworzenia konta.');
-                    }
-                });
-            });
+        $.ajax({
+            url: '/transactions/api.php',
+            type: 'POST',
+            data: { action: 'create_admin', username: username, email: email, password: password }, 
+            success: function(response) {
+                var result = JSON.parse(response);
+                $("#adminMessage").text(result.message);
+            },
+            error: function() {
+                $("#adminMessage").text('Wystąpił błąd podczas tworzenia konta.');
+            }
         });
+    });
+});
+
     </script>
 </body>
 </html>

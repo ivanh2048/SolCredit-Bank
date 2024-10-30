@@ -40,32 +40,26 @@ switch ($action) {
         }
         break;
 
-    case 'create_admin':
-        // Obsługa tworzenia administratora
-        $username = htmlspecialchars($_POST['username']);
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-        // Sprawdź, czy nazwa użytkownika już istnieje
-        $stmt = $conn->prepare("SELECT * FROM bank.users WHERE username = ?");
-        $stmt->bindParam(1, $username);
-        $stmt->execute();
-        $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($existingUser) {
-            echo json_encode(['status' => 'error', 'message' => 'Nazwa użytkownika już istnieje']);
-        } else {
-            // Tworzenie nowego konta administratora
-            $stmt = $conn->prepare("INSERT INTO bank.users (username, password, role) VALUES (?, ?, 'admin')");
-            if ($stmt->execute([$username, $password])) {
-                echo json_encode(['status' => 'success', 'message' => 'Konto administratora zostało utworzone']);
+        case 'create_admin':
+            $username = htmlspecialchars($_POST['username']);
+            $email = htmlspecialchars($_POST['email']); 
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        
+            $stmt = $conn->prepare("SELECT * FROM bank.users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+            if ($existingUser) {
+                echo json_encode(['status' => 'error', 'message' => 'Nazwa użytkownika lub e-mail już istnieje']);
             } else {
-                echo json_encode(['status' => 'error', 'message' => 'Błąd podczas tworzenia konta']);
+                $stmt = $conn->prepare("INSERT INTO bank.users (username, email, password, role) VALUES (?, ?, ?, 'admin')");
+                if ($stmt->execute([$username, $email, $password])) {
+                    echo json_encode(['status' => 'success', 'message' => 'Konto administratora zostało utworzone']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'Błąd podczas tworzenia konta']);
+                }
             }
-        }
-        break;
-
-    default:
-        echo json_encode(['status' => 'error', 'message' => 'Nieznane działanie']);
-        break; // Upewnij się, że jest tu break, aby uniknąć przypadkowego wchodzenia do kolejnych case'ów
+            break;
+        
 }
 ?>
